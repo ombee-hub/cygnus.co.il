@@ -6,6 +6,29 @@
 
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  // Marquee — auto-duplicate items so the track is always wide enough for a seamless loop
+  const marqueeTrack = document.querySelector('.marquee-track');
+  if (marqueeTrack) {
+    const setupMarquee = () => {
+      const originalChildren = Array.from(marqueeTrack.children).map(el => el.cloneNode(true));
+      const oneCopyWidth = marqueeTrack.scrollWidth;
+      if (oneCopyWidth <= 0) return;
+      let safety = 6;
+      while (marqueeTrack.scrollWidth < window.innerWidth * 2 + oneCopyWidth && safety-- > 0) {
+        originalChildren.forEach(el => {
+          const clone = el.cloneNode(true);
+          clone.setAttribute('aria-hidden', 'true');
+          marqueeTrack.appendChild(clone);
+        });
+      }
+    };
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(setupMarquee);
+    } else {
+      window.addEventListener('load', setupMarquee);
+    }
+  }
+
   const onScroll = () => {
     if (header) header.classList.toggle('scrolled', window.scrollY > 12);
   };
