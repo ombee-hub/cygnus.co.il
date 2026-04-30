@@ -2115,7 +2115,7 @@ img, svg { max-width: 100%; display: block; }
   max-width: 100%;
 }
 .rich-footer .footer-brand-link .brand-mark { width: 44px; height: 44px; flex-shrink: 0; }
-.rich-footer .footer-brand-link .brand-logo { height: 56px; width: auto; }
+.rich-footer .footer-brand-link .brand-logo { height: 38px; width: auto; }
 .rich-footer .footer-brand-link .brand-text { display: flex; flex-direction: column; line-height: 1; }
 .rich-footer .footer-brand-link .brand-name {
   font-size: 1.35rem;
