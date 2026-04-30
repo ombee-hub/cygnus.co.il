@@ -2044,6 +2044,56 @@ img, svg { max-width: 100%; display: block; }
   background: linear-gradient(90deg, transparent 0%, var(--brand) 50%, transparent 100%);
   opacity: .55;
 }
+
+/* Sitemap heading centered at top of footer */
+.footer-sitemap {
+  text-align: center;
+  padding-bottom: 22px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--line);
+}
+.footer-sitemap h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--brand);
+}
+.footer-sitemap ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+}
+.footer-sitemap li {
+  position: relative;
+}
+.footer-sitemap li + li::before {
+  content: "·";
+  position: absolute;
+  inset-inline-end: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+  font-weight: 700;
+  pointer-events: none;
+}
+.footer-sitemap a {
+  color: var(--ink-2);
+  font-size: .9rem;
+  font-weight: 500;
+  transition: color .2s;
+}
+.footer-sitemap a:hover { color: var(--brand); }
+
+@media (max-width: 1024px) {
+  .footer-sitemap { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .footer-sitemap ul { gap: 6px 16px; }
+}
+
 .rich-footer .footer-main {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr 1.3fr;
