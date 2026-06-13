@@ -68,7 +68,7 @@ body {
     radial-gradient(900px 500px at 88% -8%, rgba(44, 91, 201, .08), transparent 60%),
     radial-gradient(800px 480px at -10% 20%, rgba(26, 45, 140, .10), transparent 60%),
     radial-gradient(700px 400px at 50% 100%, rgba(74, 120, 224, .07), transparent 60%),
-    url("cnvbkgnd-original.jpg");
+    url("images/cnvbkgnd-original.jpg");
   background-repeat: no-repeat, no-repeat, no-repeat, repeat;
   background-size: auto, auto, auto, 120px 120px;
   background-attachment: fixed, fixed, fixed, fixed;
@@ -183,10 +183,18 @@ img, svg { max-width: 100%; display: block; }
   background: var(--brand);
   border: 1px solid var(--brand-strong);
   margin-inline-start: 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 }
+.primary-nav .cta-link .btn-plane { width: 16px; height: 16px; }
 .primary-nav .cta-link:hover {
   background: var(--brand-strong);
   color: #fff;
+}
+.primary-nav .cta-link:hover .btn-plane {
+  transform: scaleX(-1) translate(-3px, -1px);
 }
 .primary-nav a.is-active {
   color: var(--brand);
@@ -423,6 +431,9 @@ img, svg { max-width: 100%; display: block; }
 .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
+/* Drawer overlay exists in the DOM always; only shown on mobile (see media query) */
+.nav-overlay { display: none; }
+
 /* ===========================
    Buttons
    =========================== */
@@ -431,7 +442,7 @@ img, svg { max-width: 100%; display: block; }
   align-items: center;
   gap: 10px;
   padding: 13px 26px;
-  border-radius: var(--radius-pill);
+  border-radius: 12px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
@@ -1753,8 +1764,8 @@ img, svg { max-width: 100%; display: block; }
   user-select: none;
 }
 @keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from { transform: translateX(var(--marquee-shift, 50%)); }
+  to   { transform: translateX(0); }
 }
 
 /* ===========================
@@ -3130,6 +3141,20 @@ body.acc-cursor [role='button'] {
 }
 
 /* ===========================
+   Decorative numbering — hidden site-wide (per request).
+   Covers nav (01–06), feature/service/deploy (0X) and the timeline steps;
+   the timeline's connector line is hidden too so it reads as a clean list.
+   =========================== */
+.nd-num,
+.feature-num,
+.service-num,
+.deploy-num,
+.fv-step,
+.fv-timeline::before {
+  display: none !important;
+}
+
+/* ===========================
    Responsive
    =========================== */
 @media (max-width: 980px) {
@@ -3150,6 +3175,10 @@ body.acc-cursor [role='button'] {
 
   .nav-wrap { gap: 8px; height: 64px; justify-content: flex-start; }
 
+  /* backdrop-filter creates a containing block that would trap the position:fixed
+     drawer inside the 64px header — drop it on mobile so the drawer spans the viewport */
+  .site-header { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
   /* Hamburger on the far right (RTL start), then brand */
   .nav-toggle {
     order: 1;
@@ -3159,29 +3188,50 @@ body.acc-cursor [role='button'] {
   .brand { order: 2; }
   .primary-nav { order: 3; }
 
-  /* Mobile dropdown menu when hamburger opens */
+  /* Mobile side drawer + dark overlay (slides in from the inline-start / right in RTL) */
   .primary-nav {
-    position: absolute;
+    position: fixed;
     top: 64px;
+    bottom: 0;
     inset-inline-start: 0;
-    inset-inline-end: 0;
+    inset-inline-end: auto;
+    width: min(82vw, 340px);
     flex-direction: column;
     align-items: stretch;
-    background: rgba(251,247,232,.98);
-    border-bottom: 1px solid var(--line);
-    padding: 12px;
+    background: rgb(251, 247, 232);
+    border-inline-start: 1px solid var(--line);
+    padding: 16px;
     gap: 4px;
-    transform: translateY(-12px);
-    opacity: 0;
+    transform: translateX(100%);
     pointer-events: none;
-    transition: opacity .2s, transform .2s;
+    transition: transform .3s ease;
     box-shadow: var(--shadow-2);
+    overflow-y: auto;
+    z-index: 130;
   }
   .primary-nav.open {
-    opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
     pointer-events: auto;
   }
+  .nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 64px 0 0 0;
+    background: rgba(15, 23, 42, .5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+    z-index: 120;
+  }
+  .nav-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body.nav-open { overflow: hidden; }
+  /* The header (z-index:50, sticky) is a stacking context that traps the drawer.
+     While the menu is open, lift the whole header above the overlay so the
+     cream drawer panel paints on top of the dark scrim. */
+  body.nav-open .site-header { z-index: 140; }
   .primary-nav a,
   .primary-nav .nav-dropdown-link {
     padding: 12px 14px;

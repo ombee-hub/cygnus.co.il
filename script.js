@@ -21,6 +21,19 @@
           marqueeTrack.appendChild(clone);
         });
       }
+      // Drive the loop by the EXACT width of the first half so the wrap is perfectly seamless.
+      // A naive translateX(-50%) is off by ~half a gap, because gaps sit between items (n-1 of
+      // them) rather than after every item — causing a small jump every cycle.
+      const kids = marqueeTrack.children;
+      const half = Math.floor(kids.length / 2);
+      const shift = Math.abs(kids[half].getBoundingClientRect().left - kids[0].getBoundingClientRect().left);
+      if (shift > 0) {
+        marqueeTrack.style.setProperty('--marquee-shift', shift + 'px');
+        // Restart the animation so the keyframe re-resolves with the new shift value.
+        marqueeTrack.style.animationName = 'none';
+        void marqueeTrack.offsetWidth;
+        marqueeTrack.style.animationName = '';
+      }
     };
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(setupMarquee);
@@ -36,15 +49,21 @@
   onScroll();
 
   if (toggle && nav) {
-    toggle.addEventListener('click', () => {
-      const open = nav.classList.toggle('open');
+    // Dark overlay behind the drawer; tapping it closes the menu.
+    const overlay = document.createElement('div');
+    overlay.className = 'nav-overlay';
+    document.body.appendChild(overlay);
+    const setNav = (open) => {
+      nav.classList.toggle('open', open);
+      overlay.classList.toggle('open', open);
+      document.body.classList.toggle('nav-open', open);
       toggle.setAttribute('aria-expanded', String(open));
-    });
-    nav.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => {
-        nav.classList.remove('open');
-        toggle.setAttribute('aria-expanded', 'false');
-      });
+    };
+    toggle.addEventListener('click', () => setNav(!nav.classList.contains('open')));
+    overlay.addEventListener('click', () => setNav(false));
+    nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setNav(false)));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('open')) setNav(false);
     });
   }
 
